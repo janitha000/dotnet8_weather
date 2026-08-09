@@ -10,13 +10,20 @@ public class CityService : ICityService
     private readonly IMemoryCache _cache;
     private readonly ICityNormalizer _cityNormalizer;
     private readonly CacheOptions _cacheOptions;
+    private readonly ILogger<CityService> _logger;
 
-    public CityService(AppDbContext dbContext, IMemoryCache cache, ICityNormalizer cityNormalizer, IOptions<CacheOptions> cacheOptions)
+    public CityService(
+        AppDbContext dbContext, 
+        IMemoryCache cache, 
+        ICityNormalizer cityNormalizer,
+         IOptions<CacheOptions> cacheOptions, 
+         ILogger<CityService> logger)
     {
         _dbContext = dbContext;
         _cache = cache;
         _cityNormalizer = cityNormalizer;
         _cacheOptions = cacheOptions.Value;
+        _logger = logger;
     }
 
     public async Task<City?> GetCityByNameAsync(string name)
@@ -25,8 +32,13 @@ public class CityService : ICityService
 
         var cacheKey = $"city:{_cityNormalizer.Normalize(name)}";
 
-        if (_cache.TryGetValue(cacheKey, out City? cachedCity))
+        if (_cache.TryGetValue(cacheKey, out City? cachedCity)){
+            _logger.LogInformation("City found in cache: {CityName}", cachedCity.Name);
             return cachedCity;
+
+        }
+
+        _logger.LogInformation("City not found in cache: {CityName}", name);
 
         var city = await _dbContext.Cities
                     .AsNoTracking()
@@ -45,7 +57,10 @@ public class CityService : ICityService
         var normalizedName = _cityNormalizer.Normalize(city.Name);
         var isDuplicate = await _dbContext.Cities.AnyAsync(c => c.Name.ToLower() == normalizedName.ToLower());
         
-        if(isDuplicate) throw new DuplicateException($"City with name {city.Name} already exists");
+        if(isDuplicate) {
+            _logger.LogWarning("City already exists: {CityName}", city.Name);
+            throw new DuplicateException($"City with name {city.Name} already exists");
+        }
 
 
         _dbContext.Cities.Add(city);
