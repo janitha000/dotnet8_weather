@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
@@ -20,6 +21,7 @@ public class CityController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize]
     [ProducesResponseType(typeof(City), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<City>> CreateCityAsync([FromBody] CreateCityDto createCityDto)
