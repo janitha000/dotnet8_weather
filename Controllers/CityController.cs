@@ -13,6 +13,7 @@ public class CityController : ControllerBase
     }
 
     [HttpGet("{name}")]
+    [Authorize(Policy = "AdminOnly")]
     public async Task<IActionResult> GetCityByNameAsync(string name, CancellationToken cancellationToken = default)
     {
         var city = await _cityService.GetCityByNameAsync(name, cancellationToken);

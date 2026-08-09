@@ -1,5 +1,16 @@
+using System.Net.Http.Json;
+using Microsoft.EntityFrameworkCore;
+
 public class WeatherService : IWeatherService
 {
+
+    private readonly HttpClient _httpClient;
+
+    public WeatherService(HttpClient httpClient)
+    {
+        _httpClient = httpClient;
+    }
+
     public Task<WeatherDTO?> GetCurrentWeatherByCityAsync(string city)
     {
         if (string.IsNullOrEmpty(city)) return Task.FromResult<WeatherDTO?>(null);
@@ -32,5 +43,29 @@ public class WeatherService : IWeatherService
         };
 
         return Task.FromResult<List<WeatherDTO>?>(result);
+    }
+
+    public async Task<WeatherDTO> GetWeatherByCityAsyncAPI(string city, CancellationToken cancellationToken = default)
+    {
+        var Latitude = "80.6356";
+        var Longitude = "7.2955";
+        var url =$"v1/forecast?latitude={Latitude}&longitude={Longitude}" +"&current=temperature_2m,weather_code";
+        
+        using var response = await _httpClient.GetAsync(url, cancellationToken);
+        if (!response.IsSuccessStatusCode)
+        {
+            throw new Exception($"Failed to get weather data for {city}");
+        }
+
+        var api = await response.Content.ReadFromJsonAsync<OpenMeteoResponse>();
+        if (api?.Current is null) return null;
+        return new WeatherDTO
+        {
+            City = city,
+            Country = "Sri Lanka",
+            Temperature = (int)Math.Round(api.Current.Temperature_2m),
+            Summary = $"Code {api.Current.Weather_Code}",
+            RetrievedAt = DateTime.UtcNow
+        };
     }
 }

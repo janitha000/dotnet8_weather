@@ -7,3 +7,15 @@ public class WeatherDTO
     public DateTime RetrievedAt { get; set; } 
     public DateTime ForecastedAt { get; set; }
 }
+
+
+public class OpenMeteoResponse
+{
+    public CurrentWeather? Current { get; set; }
+}
+
+public class CurrentWeather
+{
+    public double Temperature_2m { get; set; }
+    public int Weather_Code { get; set; }
+}

@@ -11,9 +11,10 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
 
-builder.Services.AddScoped<IWeatherService, WeatherService>();
 builder.Services.AddScoped<ICityService, CityService>();
 builder.Services.AddScoped<IJWTService, JWTService>();
+
+
 
 builder.Services.AddTransient<ICityNormalizer, CityNormalizer>();
 
@@ -21,6 +22,17 @@ builder.Services.Configure<CacheOptions>(
     builder.Configuration.GetSection(CacheOptions.SectionName));
 builder.Services.Configure<JWTOptions>(
     builder.Configuration.GetSection(JWTOptions.SectionName));
+builder.Services.Configure<WeatherAPIOptions>(
+    builder.Configuration.GetSection(WeatherAPIOptions.SectionName));
+
+
+builder.Services.AddHttpClient<IWeatherService, WeatherService>((sp, client) =>
+{
+    var opts = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<WeatherAPIOptions>>().Value;
+    client.BaseAddress = new Uri(opts.BaseUrl);
+    client.Timeout = TimeSpan.FromSeconds(30);
+});
+
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("Default")));
