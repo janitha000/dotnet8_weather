@@ -26,7 +26,7 @@ public class CityService : ICityService
         _logger = logger;
     }
 
-    public async Task<City?> GetCityByNameAsync(string name)
+    public async Task<City?> GetCityByNameAsync(string name, CancellationToken cancellationToken = default)
     {
         if(string.IsNullOrEmpty(name)) return null;
 
@@ -42,7 +42,7 @@ public class CityService : ICityService
 
         var city = await _dbContext.Cities
                     .AsNoTracking()
-                    .FirstOrDefaultAsync(c => c.Name.ToLower() == name.ToLower());
+                    .FirstOrDefaultAsync(c => c.Name.ToLower() == name.ToLower(), cancellationToken);
 
         if(city is not null){
             _cache.Set(cacheKey, city, new MemoryCacheEntryOptions{
@@ -53,9 +53,9 @@ public class CityService : ICityService
         return city;
     } 
 
-    public async Task<City> CreateCityAsync(City city){
+    public async Task<City> CreateCityAsync(City city, CancellationToken cancellationToken = default){
         var normalizedName = _cityNormalizer.Normalize(city.Name);
-        var isDuplicate = await _dbContext.Cities.AnyAsync(c => c.Name.ToLower() == normalizedName.ToLower());
+        var isDuplicate = await _dbContext.Cities.AnyAsync(c => c.Name.ToLower() == normalizedName.ToLower(), cancellationToken);
         
         if(isDuplicate) {
             _logger.LogWarning("City already exists: {CityName}", city.Name);
@@ -64,7 +64,7 @@ public class CityService : ICityService
 
 
         _dbContext.Cities.Add(city);
-        await _dbContext.SaveChangesAsync();
+        await _dbContext.SaveChangesAsync(cancellationToken);
 
         var cacheKey = $"city:{_cityNormalizer.Normalize(city.Name)}";
          _cache.Set(cacheKey, city, new MemoryCacheEntryOptions{

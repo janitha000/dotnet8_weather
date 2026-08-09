@@ -13,9 +13,9 @@ public class CityController : ControllerBase
     }
 
     [HttpGet("{name}")]
-    public async Task<IActionResult> GetCityByNameAsync(string name)
+    public async Task<IActionResult> GetCityByNameAsync(string name, CancellationToken cancellationToken = default)
     {
-        var city = await _cityService.GetCityByNameAsync(name);
+        var city = await _cityService.GetCityByNameAsync(name, cancellationToken);
         if (city == null) return NotFound("City not found");
         return Ok(city);
     }
@@ -24,7 +24,7 @@ public class CityController : ControllerBase
     [Authorize(Policy = "AdminOnly")]
     [ProducesResponseType(typeof(City), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<City>> CreateCityAsync([FromBody] CreateCityDto createCityDto)
+    public async Task<ActionResult<City>> CreateCityAsync([FromBody] CreateCityDto createCityDto, CancellationToken cancellationToken = default)
     {
         var city = new City
         {
@@ -34,7 +34,7 @@ public class CityController : ControllerBase
             Longitude = createCityDto.Longitude
         };
 
-        city = await _cityService.CreateCityAsync(city);
+        city = await _cityService.CreateCityAsync(city, cancellationToken);
         return CreatedAtAction(nameof(GetCityByNameAsync), new { name = city.Name }, city);
     }
 }
