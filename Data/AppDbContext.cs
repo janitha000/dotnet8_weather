@@ -7,5 +7,14 @@ public class AppDbContext : DbContext
        
     }
 
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+         modelBuilder.Entity<City>(e =>
+        {
+            e.HasIndex(x => x.Name).IsUnique();
+            e.Property(x => x.Name).HasMaxLength(100).IsRequired();
+        });
+    }
+
     public DbSet<City> Cities  => Set<City>();
 }

@@ -68,7 +68,7 @@ app.UseExceptionHandler();
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    db.Database.EnsureCreated(); // creates interview.db + Cities table if missing
+    db.Database.Migrate();  // creates interview.db + Cities table if missing
 
     if (!db.Cities.Any())
     {

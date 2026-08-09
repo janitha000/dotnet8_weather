@@ -7,6 +7,7 @@ public class City
     public string Country { get; set; } = string.Empty;
     public string Latitude { get; set; } = string.Empty;
     public string Longitude { get; set; } = string.Empty;
+    public string TimeZone { get; set; } = string.Empty;
 }
 
 public class CreateCityDto
@@ -28,4 +29,6 @@ public class CreateCityDto
     [Required]
     [RegularExpression(@"^-?\d+(\.\d+)?$", ErrorMessage = "Longitude must be a number")]
     public string Longitude { get; set; } = string.Empty;
+
+    public string TimeZone { get; set; } = string.Empty;
 }
