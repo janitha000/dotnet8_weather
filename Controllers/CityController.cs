@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
+[ServiceFilter(typeof(LogActionFilter))]
 [ApiController]
 [Route("api/cities")]
 public class CityController : ControllerBase
@@ -13,7 +14,7 @@ public class CityController : ControllerBase
     }
 
     [HttpGet("{name}")]
-    [Authorize(Policy = "AdminOnly")]
+    // [Authorize(Policy = "AdminOnly")]
     public async Task<IActionResult> GetCityByNameAsync(string name, CancellationToken cancellationToken = default)
     {
         var city = await _cityService.GetCityByNameAsync(name, cancellationToken);

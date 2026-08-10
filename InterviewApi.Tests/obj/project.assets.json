@@ -8667,7 +8667,7 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\Janitha\\AppData\\Local\\Temp\\cursor-sandbox-cache\\965bd5435b0d1994f9943dc13a76f9e7\\nuget": {}
+    "C:\\Users\\Janitha\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
@@ -8675,7 +8675,7 @@
       "projectUniqueName": "D:\\Interview\\dot net core\\InterviewApi.Tests\\InterviewApi.Tests.csproj",
       "projectName": "InterviewApi.Tests",
       "projectPath": "D:\\Interview\\dot net core\\InterviewApi.Tests\\InterviewApi.Tests.csproj",
-      "packagesPath": "C:\\Users\\Janitha\\AppData\\Local\\Temp\\cursor-sandbox-cache\\965bd5435b0d1994f9943dc13a76f9e7\\nuget",
+      "packagesPath": "C:\\Users\\Janitha\\.nuget\\packages\\",
       "outputPath": "D:\\Interview\\dot net core\\InterviewApi.Tests\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [

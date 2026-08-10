@@ -11,10 +11,15 @@ public static class ServiceCollectionExtensions
         {
             services.AddEndpointsApiExplorer();
             services.AddSwaggerGen();
-            services.AddControllers();
+            services.AddControllers( options =>
+                {
+                    options.Filters.Add<LogActionFilter>();
+                }
+            );
 
             services.AddScoped<ICityService, CityService>();
             services.AddScoped<IJWTService, JWTService>();
+            services.AddScoped<LogActionFilter>();
 
             services.AddTransient<ICityNormalizer, CityNormalizer>();
 
