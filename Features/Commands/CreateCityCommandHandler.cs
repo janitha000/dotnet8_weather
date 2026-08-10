@@ -1,26 +1,21 @@
 using MediatR;
-using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Options;
 
 public class CreateCityCommandHandler : IRequestHandler<CreateCityCommand, City>
 {
     private readonly ICityRepository _cityRepository;
     private readonly ICityNormalizer _cityNormalizer;
-    private readonly IMemoryCache _memoryCache;
-    private readonly CacheOptions _cacheOptions;
+    private readonly IPublisher _publisher;
     private readonly ILogger<CreateCityCommandHandler> _logger;
 
     public CreateCityCommandHandler(
         ICityRepository cityRepository,
         ICityNormalizer cityNormalizer,
-        IMemoryCache memoryCache,
-        IOptions<CacheOptions> cacheOptions,
+        IPublisher publisher,
         ILogger<CreateCityCommandHandler> logger)
     {
         _cityRepository = cityRepository;
         _cityNormalizer = cityNormalizer;
-        _memoryCache = memoryCache;
-        _cacheOptions = cacheOptions.Value;
+        _publisher = publisher;
         _logger = logger;
     }
 
@@ -45,11 +40,15 @@ public class CreateCityCommandHandler : IRequestHandler<CreateCityCommand, City>
         await _cityRepository.AddAsync(city, cancellationToken);
         await _cityRepository.SaveChangesAsync(cancellationToken);
 
-        var cacheKey = $"city:{normalizedName}";
-        _memoryCache.Set(cacheKey, city, new MemoryCacheEntryOptions
-        {
-            AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(_cacheOptions.Duration)
-        });
+        await _publisher.Publish(
+            new CityCreated(
+                city.Id,
+                city.Name,
+                city.Country,
+                city.Latitude,
+                city.Longitude,
+                city.TimeZone),
+            cancellationToken);
 
         return city;
     }
