@@ -1,11 +1,10 @@
 using System.Net;
-using Microsoft.AspNetCore.Mvc.Testing;
 
-public class CitiesApiTests : IClassFixture<WebApplicationFactory<Program>>
+public class CitiesApiTests : IClassFixture<InterviewApiWebApplicationFactory>
 {
     private readonly HttpClient _client;
 
-    public CitiesApiTests(WebApplicationFactory<Program> factory)
+    public CitiesApiTests(InterviewApiWebApplicationFactory factory)
     {
         _client = factory.CreateClient();
     }

@@ -10,7 +10,7 @@
         "projectUniqueName": "D:\\Interview\\dot net core\\InterviewApi.csproj",
         "projectName": "InterviewApi",
         "projectPath": "D:\\Interview\\dot net core\\InterviewApi.csproj",
-        "packagesPath": "C:\\Users\\Janitha\\.nuget\\packages\\",
+        "packagesPath": "C:\\Users\\Janitha\\AppData\\Local\\Temp\\cursor-sandbox-cache\\965bd5435b0d1994f9943dc13a76f9e7\\nuget",
         "outputPath": "D:\\Interview\\dot net core\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
@@ -96,7 +96,7 @@
         "projectUniqueName": "D:\\Interview\\dot net core\\InterviewApi.Tests\\InterviewApi.Tests.csproj",
         "projectName": "InterviewApi.Tests",
         "projectPath": "D:\\Interview\\dot net core\\InterviewApi.Tests\\InterviewApi.Tests.csproj",
-        "packagesPath": "C:\\Users\\Janitha\\.nuget\\packages\\",
+        "packagesPath": "C:\\Users\\Janitha\\AppData\\Local\\Temp\\cursor-sandbox-cache\\965bd5435b0d1994f9943dc13a76f9e7\\nuget",
         "outputPath": "D:\\Interview\\dot net core\\InterviewApi.Tests\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
