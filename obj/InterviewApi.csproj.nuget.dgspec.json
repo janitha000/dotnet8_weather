@@ -10,7 +10,7 @@
         "projectUniqueName": "D:\\Interview\\dot net core\\InterviewApi.csproj",
         "projectName": "InterviewApi",
         "projectPath": "D:\\Interview\\dot net core\\InterviewApi.csproj",
-        "packagesPath": "C:\\Users\\Janitha\\AppData\\Local\\Temp\\cursor-sandbox-cache\\965bd5435b0d1994f9943dc13a76f9e7\\nuget",
+        "packagesPath": "C:\\Users\\Janitha\\AppData\\Local\\Temp\\cursor-sandbox-cache\\fbc469b689efbdef5b602f6992442cf6\\nuget",
         "outputPath": "D:\\Interview\\dot net core\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
@@ -65,6 +65,10 @@
             "Microsoft.EntityFrameworkCore.Sqlite": {
               "target": "Package",
               "version": "[8.0.11, )"
+            },
+            "Microsoft.Extensions.Http.Resilience": {
+              "target": "Package",
+              "version": "[8.10.0, )"
             },
             "Swashbuckle.AspNetCore": {
               "target": "Package",

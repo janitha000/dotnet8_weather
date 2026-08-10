@@ -12,18 +12,22 @@ public class CurrentWeatherByCityController : ControllerBase
     }
 
     [HttpGet("{city}")]
-    public async Task<IActionResult> GetCurrentWeatherByCityAsync(string city)
+    public async Task<IActionResult> GetCurrentWeatherByCityAsync(
+        string city,
+        CancellationToken cancellationToken)
     {
-        var weather = await _weatherService.GetCurrentWeatherByCityAsync(city);
+        var weather = await _weatherService.GetCurrentWeatherByCityAsync(city, cancellationToken);
         if (weather == null) return NotFound("City not found");
         return Ok(weather);
     }
 
     [HttpGet("{city}/forecast")]
-    public async Task<IActionResult> GetForecastWeatherByCityAsync(string city)
+    public async Task<IActionResult> GetForecastWeatherByCityAsync(
+        string city,
+        CancellationToken cancellationToken)
     {
-        var weather = await _weatherService.GetForecastWeatherByCityAsync(city);
-        if (weather == null) return NotFound("City not found");
-        return Ok(weather);
+        var forecast = await _weatherService.GetForecastWeatherByCityAsync(city, cancellationToken);
+        if (forecast == null) return NotFound("City not found");
+        return Ok(forecast);
     }
 }

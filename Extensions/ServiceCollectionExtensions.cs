@@ -45,7 +45,15 @@ public static class ServiceCollectionExtensions
             {
                 var opts = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<WeatherAPIOptions>>().Value;
                 client.BaseAddress = new Uri(opts.BaseUrl);
-                client.Timeout = TimeSpan.FromSeconds(30);
+                // Resilience handler owns timeouts (avoid fighting HttpClient.Timeout)
+                client.Timeout = Timeout.InfiniteTimeSpan;
+            })
+            .AddStandardResilienceHandler(options =>
+            {
+                options.Retry.MaxRetryAttempts = 3;
+                options.TotalRequestTimeout.Timeout = TimeSpan.FromSeconds(30);
+                options.AttemptTimeout.Timeout = TimeSpan.FromSeconds(10);
+                options.CircuitBreaker.SamplingDuration = TimeSpan.FromSeconds(30);
             });
 
             
