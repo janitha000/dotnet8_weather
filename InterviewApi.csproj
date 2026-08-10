@@ -39,6 +39,10 @@
     <Content Remove="GatewayApi/**" />
     <EmbeddedResource Remove="GatewayApi/**" />
     <None Remove="GatewayApi/**" />
+    <Compile Remove="infra/**" />
+    <Content Remove="infra/**" />
+    <EmbeddedResource Remove="infra/**" />
+    <None Remove="infra/**" />
   </ItemGroup>
 
 </Project>

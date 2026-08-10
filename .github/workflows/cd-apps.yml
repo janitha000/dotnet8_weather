@@ -1,0 +1,83 @@
+name: cd-apps
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "**.cs"
+      - "**.csproj"
+      - "Protos/**"
+      - "Dockerfile.cities"
+      - "Dockerfile.weather"
+      - ".dockerignore"
+      - ".github/workflows/cd-apps.yml"
+      - "WeatherApi/**"
+      - "!InterviewApi.Tests/**"
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+concurrency:
+  group: cd-apps-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  CITIES_IMAGE: cities-api
+  WEATHER_IMAGE: weather-api
+
+jobs:
+  build-push-deploy:
+    runs-on: ubuntu-latest
+    environment: azure-dev
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Azure login (OIDC)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Login to ACR
+        run: az acr login --name ${{ vars.AZURE_ACR_NAME }}
+
+      - name: Set image tags
+        id: tags
+        run: |
+          ACR=${{ vars.AZURE_ACR_NAME }}.azurecr.io
+          SHA=${GITHUB_SHA::12}
+          echo "cities=$ACR/${{ env.CITIES_IMAGE }}:$SHA" >> $GITHUB_OUTPUT
+          echo "weather=$ACR/${{ env.WEATHER_IMAGE }}:$SHA" >> $GITHUB_OUTPUT
+          echo "cities_latest=$ACR/${{ env.CITIES_IMAGE }}:latest" >> $GITHUB_OUTPUT
+          echo "weather_latest=$ACR/${{ env.WEATHER_IMAGE }}:latest" >> $GITHUB_OUTPUT
+
+      - name: Build and push cities
+        run: |
+          docker build -f Dockerfile.cities \
+            -t ${{ steps.tags.outputs.cities }} \
+            -t ${{ steps.tags.outputs.cities_latest }} .
+          docker push ${{ steps.tags.outputs.cities }}
+          docker push ${{ steps.tags.outputs.cities_latest }}
+
+      - name: Build and push weather
+        run: |
+          docker build -f Dockerfile.weather \
+            -t ${{ steps.tags.outputs.weather }} \
+            -t ${{ steps.tags.outputs.weather_latest }} .
+          docker push ${{ steps.tags.outputs.weather }}
+          docker push ${{ steps.tags.outputs.weather_latest }}
+
+      - name: Update Container Apps
+        run: |
+          az containerapp update \
+            --name ${{ vars.CITIES_CONTAINER_APP }} \
+            --resource-group ${{ vars.AZURE_RESOURCE_GROUP }} \
+            --image ${{ steps.tags.outputs.cities }}
+
+          az containerapp update \
+            --name ${{ vars.WEATHER_CONTAINER_APP }} \
+            --resource-group ${{ vars.AZURE_RESOURCE_GROUP }} \
+            --image ${{ steps.tags.outputs.weather }}
