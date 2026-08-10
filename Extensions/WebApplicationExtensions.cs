@@ -41,6 +41,7 @@ public static class WebApplicationExtensions
         app.UseAuthentication();
         app.UseAuthorization();
         app.MapControllers();
+        app.MapGrpcService<CityLookupGrpcService>();
 
         return app;
     }

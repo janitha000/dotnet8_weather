@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+option csharp_namespace = "Cities.Grpc";
+
+package cities;
+
+service CityLookup {
+  rpc FindByName (FindCityByNameRequest) returns (FindCityByNameReply);
+}
+
+message FindCityByNameRequest {
+  string name = 1;
+}
+
+message FindCityByNameReply {
+  bool found = 1;
+  string name = 2;
+  string country = 3;
+  string latitude = 4;
+  string longitude = 5;
+}

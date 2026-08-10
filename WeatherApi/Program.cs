@@ -1,3 +1,5 @@
+using Cities.Grpc;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddEndpointsApiExplorer();
@@ -18,7 +20,12 @@ builder.Services.Configure<WeatherAPIOptions>(
 builder.Services.Configure<CitiesApiOptions>(
     builder.Configuration.GetSection(CitiesApiOptions.SectionName));
 
-builder.Services.AddHttpClient<ICityLookup, CityLookupHttpClient>((sp, client) =>
+var citiesOpts = builder.Configuration
+    .GetSection(CitiesApiOptions.SectionName)
+    .Get<CitiesApiOptions>() ?? new CitiesApiOptions();
+
+// Keep HTTP adapter available (typed client registers CityLookupHttpClient).
+builder.Services.AddHttpClient<CityLookupHttpClient>((sp, client) =>
 {
     var opts = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<CitiesApiOptions>>().Value;
     client.BaseAddress = new Uri(opts.BaseUrl.TrimEnd('/') + "/");
@@ -31,6 +38,20 @@ builder.Services.AddHttpClient<ICityLookup, CityLookupHttpClient>((sp, client) =
     options.AttemptTimeout.Timeout = TimeSpan.FromSeconds(10);
     options.CircuitBreaker.SamplingDuration = TimeSpan.FromSeconds(30);
 });
+
+// Keep gRPC adapter available (generated CityLookupClient + wrapper).
+AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
+builder.Services.AddGrpcClient<CityLookup.CityLookupClient>(o =>
+{
+    o.Address = new Uri(citiesOpts.GrpcUrl);
+});
+builder.Services.AddScoped<CityLookupGrpcClient>();
+
+// Weather always depends on ICityLookup — switch transport via config.
+if (string.Equals(citiesOpts.LookupMode, "Grpc", StringComparison.OrdinalIgnoreCase))
+    builder.Services.AddScoped<ICityLookup>(sp => sp.GetRequiredService<CityLookupGrpcClient>());
+else
+    builder.Services.AddScoped<ICityLookup>(sp => sp.GetRequiredService<CityLookupHttpClient>());
 
 builder.Services.AddHttpClient<IWeatherService, WeatherService>((sp, client) =>
 {

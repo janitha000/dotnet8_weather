@@ -23,6 +23,7 @@ public static class ServiceCollectionExtensions
             services.AddScoped<LogActionFilter>();
             services.AddScoped<ICityRepository, CityRepository>();
             services.AddHostedService<OutboxDispatcher>();
+            services.AddGrpc();
 
             services.AddTransient<ICityNormalizer, CityNormalizer>();
 
