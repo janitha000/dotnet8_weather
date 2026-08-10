@@ -36,6 +36,8 @@ public static class ServiceCollectionExtensions
             services.Configure<WeatherAPIOptions>(
                 config.GetSection(WeatherAPIOptions.SectionName));
 
+            services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
+
 
             services.AddHttpClient<IWeatherService, WeatherService>((sp, client) =>
             {

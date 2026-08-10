@@ -1,11 +1,13 @@
 {
   "version": 2,
-  "dgSpecHash": "SYr2JqrvTh7fUC++FPW1E2epzchrYUgNK+jd9RrHaY8sDzGhwcvN5eWpfjkusEi3jMK5xCFUB68lzThl9v8jDA==",
+  "dgSpecHash": "v9kC30Ghh34kj6KjEzgD9eeMPahGc+/wOoJxTrhG1DmSB/uqQCDI3+e2uSVJ8NeUO1Xz+waCJq9eHQpJpp0djQ==",
   "success": true,
   "projectFilePath": "D:\\Interview\\dot net core\\InterviewApi.Tests\\InterviewApi.Tests.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Janitha\\.nuget\\packages\\castle.core\\5.1.1\\castle.core.5.1.1.nupkg.sha512",
     "C:\\Users\\Janitha\\.nuget\\packages\\coverlet.collector\\6.0.0\\coverlet.collector.6.0.0.nupkg.sha512",
+    "C:\\Users\\Janitha\\.nuget\\packages\\mediatr\\12.4.1\\mediatr.12.4.1.nupkg.sha512",
+    "C:\\Users\\Janitha\\.nuget\\packages\\mediatr.contracts\\2.0.1\\mediatr.contracts.2.0.1.nupkg.sha512",
     "C:\\Users\\Janitha\\.nuget\\packages\\microsoft.aspnetcore.authentication.jwtbearer\\8.0.11\\microsoft.aspnetcore.authentication.jwtbearer.8.0.11.nupkg.sha512",
     "C:\\Users\\Janitha\\.nuget\\packages\\microsoft.aspnetcore.mvc.testing\\8.0.11\\microsoft.aspnetcore.mvc.testing.8.0.11.nupkg.sha512",
     "C:\\Users\\Janitha\\.nuget\\packages\\microsoft.aspnetcore.openapi\\8.0.1\\microsoft.aspnetcore.openapi.8.0.1.nupkg.sha512",

@@ -457,3 +457,5 @@ D:\Interview\dot net core\InterviewApi.Tests\obj\Debug\net8.0\refint\InterviewAp
 D:\Interview\dot net core\InterviewApi.Tests\obj\Debug\net8.0\InterviewApi.Tests.pdb
 D:\Interview\dot net core\InterviewApi.Tests\obj\Debug\net8.0\InterviewApi.Tests.genruntimeconfig.cache
 D:\Interview\dot net core\InterviewApi.Tests\obj\Debug\net8.0\ref\InterviewApi.Tests.dll
+D:\Interview\dot net core\InterviewApi.Tests\bin\Debug\net8.0\MediatR.dll
+D:\Interview\dot net core\InterviewApi.Tests\bin\Debug\net8.0\MediatR.Contracts.dll
