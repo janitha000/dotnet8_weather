@@ -17,4 +17,5 @@ public class AppDbContext : DbContext
     }
 
     public DbSet<City> Cities  => Set<City>();
+    public DbSet<OutboxMessage> OutboxMessages => Set<OutboxMessage>();
 }
