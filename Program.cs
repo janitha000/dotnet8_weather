@@ -15,4 +15,6 @@ app.InitializeDatabase();   // migrate + seed
 app.UsePipeline();
 app.Run();
 
+// Makes the implicit Program class public for WebApplicationFactory<Program>
+public partial class Program { }
 

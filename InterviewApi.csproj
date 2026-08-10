@@ -19,4 +19,12 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
   </ItemGroup>
 
+  <!-- Test project lives under this folder; don't compile its sources into the web app -->
+  <ItemGroup>
+    <Compile Remove="InterviewApi.Tests/**" />
+    <Content Remove="InterviewApi.Tests/**" />
+    <EmbeddedResource Remove="InterviewApi.Tests/**" />
+    <None Remove="InterviewApi.Tests/**" />
+  </ItemGroup>
+
 </Project>
