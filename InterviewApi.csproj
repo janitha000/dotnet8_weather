@@ -17,16 +17,19 @@
     </PackageReference>
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="8.0.11" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.11" />
-    <PackageReference Include="Microsoft.Extensions.Http.Resilience" Version="8.10.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
   </ItemGroup>
 
-  <!-- Test project lives under this folder; don't compile its sources into the web app -->
+  <!-- Nested projects live under this folder; don't compile their sources into the web app -->
   <ItemGroup>
     <Compile Remove="InterviewApi.Tests/**" />
     <Content Remove="InterviewApi.Tests/**" />
     <EmbeddedResource Remove="InterviewApi.Tests/**" />
     <None Remove="InterviewApi.Tests/**" />
+    <Compile Remove="WeatherApi/**" />
+    <Content Remove="WeatherApi/**" />
+    <EmbeddedResource Remove="WeatherApi/**" />
+    <None Remove="WeatherApi/**" />
   </ItemGroup>
 
 </Project>

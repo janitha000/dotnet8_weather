@@ -1,0 +1,9 @@
+@WeatherApi_HostAddress = http://localhost:5250
+
+GET {{WeatherApi_HostAddress}}/api/weather/Colombo
+Accept: application/json
+
+###
+
+GET {{WeatherApi_HostAddress}}/api/weather/Colombo/forecast
+Accept: application/json

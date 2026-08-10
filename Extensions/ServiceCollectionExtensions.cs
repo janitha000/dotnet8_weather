@@ -22,7 +22,6 @@ public static class ServiceCollectionExtensions
             services.AddScoped<IJWTService, JWTService>();
             services.AddScoped<LogActionFilter>();
             services.AddScoped<ICityRepository, CityRepository>();
-            services.AddScoped<ICityLookup, CityLookupFromRepository>();
             services.AddHostedService<OutboxDispatcher>();
 
             services.AddTransient<ICityNormalizer, CityNormalizer>();
@@ -36,29 +35,10 @@ public static class ServiceCollectionExtensions
                 config.GetSection(CacheOptions.SectionName));
             services.Configure<JWTOptions>(
                 config.GetSection(JWTOptions.SectionName));
-            services.Configure<WeatherAPIOptions>(
-                config.GetSection(WeatherAPIOptions.SectionName));
 
             services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
 
-
-            services.AddHttpClient<IWeatherService, WeatherService>((sp, client) =>
-            {
-                var opts = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<WeatherAPIOptions>>().Value;
-                client.BaseAddress = new Uri(opts.BaseUrl);
-                // Resilience handler owns timeouts (avoid fighting HttpClient.Timeout)
-                client.Timeout = Timeout.InfiniteTimeSpan;
-            })
-            .AddStandardResilienceHandler(options =>
-            {
-                options.Retry.MaxRetryAttempts = 3;
-                options.TotalRequestTimeout.Timeout = TimeSpan.FromSeconds(30);
-                options.AttemptTimeout.Timeout = TimeSpan.FromSeconds(10);
-                options.CircuitBreaker.SamplingDuration = TimeSpan.FromSeconds(30);
-            });
-
-            
         services.AddDbContext<AppDbContext>(options =>
             options.UseSqlite(config.GetConnectionString("Default")));
 
