@@ -3,19 +3,16 @@ using System.Net.Http.Json;
 public class WeatherService : IWeatherService
 {
     private readonly HttpClient _httpClient;
-    private readonly ICityRepository _cityRepository;
-    private readonly ICityNormalizer _cityNormalizer;
+    private readonly ICityLookup _cityLookup;
     private readonly ILogger<WeatherService> _logger;
 
     public WeatherService(
         HttpClient httpClient,
-        ICityRepository cityRepository,
-        ICityNormalizer cityNormalizer,
+        ICityLookup cityLookup,
         ILogger<WeatherService> logger)
     {
         _httpClient = httpClient;
-        _cityRepository = cityRepository;
-        _cityNormalizer = cityNormalizer;
+        _cityLookup = cityLookup;
         _logger = logger;
     }
 
@@ -23,11 +20,11 @@ public class WeatherService : IWeatherService
         string city,
         CancellationToken cancellationToken = default)
     {
-        var entity = await FindCityAsync(city, cancellationToken);
-        if (entity is null) return null;
+        var location = await _cityLookup.FindByNameAsync(city, cancellationToken);
+        if (location is null) return null;
 
         var url =
-            $"v1/forecast?latitude={entity.Latitude}&longitude={entity.Longitude}" +
+            $"v1/forecast?latitude={location.Latitude}&longitude={location.Longitude}" +
             "&current=temperature_2m,weather_code";
 
         using var response = await _httpClient.GetAsync(url, cancellationToken);
@@ -36,10 +33,10 @@ public class WeatherService : IWeatherService
             _logger.LogWarning(
                 "Weather API failed with {StatusCode} for {City}",
                 response.StatusCode,
-                entity.Name);
+                location.Name);
             throw new AppException(
                 StatusCodes.Status502BadGateway,
-                $"Failed to get current weather for '{entity.Name}'");
+                $"Failed to get current weather for '{location.Name}'");
         }
 
         var api = await response.Content.ReadFromJsonAsync<OpenMeteoResponse>(cancellationToken: cancellationToken);
@@ -47,8 +44,8 @@ public class WeatherService : IWeatherService
 
         return new WeatherDTO
         {
-            City = entity.Name,
-            Country = entity.Country,
+            City = location.Name,
+            Country = location.Country,
             Temperature = (int)Math.Round(api.Current.Temperature2m),
             Summary = WeatherCodeToSummary(api.Current.WeatherCode),
             RetrievedAt = DateTime.UtcNow
@@ -59,11 +56,11 @@ public class WeatherService : IWeatherService
         string city,
         CancellationToken cancellationToken = default)
     {
-        var entity = await FindCityAsync(city, cancellationToken);
-        if (entity is null) return null;
+        var location = await _cityLookup.FindByNameAsync(city, cancellationToken);
+        if (location is null) return null;
 
         var url =
-            $"v1/forecast?latitude={entity.Latitude}&longitude={entity.Longitude}" +
+            $"v1/forecast?latitude={location.Latitude}&longitude={location.Longitude}" +
             "&daily=temperature_2m_max,weather_code&timezone=auto&forecast_days=7";
 
         using var response = await _httpClient.GetAsync(url, cancellationToken);
@@ -72,10 +69,10 @@ public class WeatherService : IWeatherService
             _logger.LogWarning(
                 "Weather forecast API failed with {StatusCode} for {City}",
                 response.StatusCode,
-                entity.Name);
+                location.Name);
             throw new AppException(
                 StatusCodes.Status502BadGateway,
-                $"Failed to get forecast for '{entity.Name}'");
+                $"Failed to get forecast for '{location.Name}'");
         }
 
         var api = await response.Content.ReadFromJsonAsync<OpenMeteoResponse>(cancellationToken: cancellationToken);
@@ -94,8 +91,8 @@ public class WeatherService : IWeatherService
 
             results.Add(new WeatherDTO
             {
-                City = entity.Name,
-                Country = entity.Country,
+                City = location.Name,
+                Country = location.Country,
                 Temperature = temp,
                 Summary = WeatherCodeToSummary(code),
                 RetrievedAt = DateTime.UtcNow,
@@ -104,14 +101,6 @@ public class WeatherService : IWeatherService
         }
 
         return results;
-    }
-
-    private async Task<City?> FindCityAsync(string city, CancellationToken cancellationToken)
-    {
-        if (string.IsNullOrWhiteSpace(city)) return null;
-
-        var normalized = _cityNormalizer.Normalize(city);
-        return await _cityRepository.GetByNameAsync(normalized, cancellationToken);
     }
 
     private static string WeatherCodeToSummary(int code) => code switch
