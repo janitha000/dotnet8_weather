@@ -35,6 +35,10 @@
     <Content Remove="WeatherApi/**" />
     <EmbeddedResource Remove="WeatherApi/**" />
     <None Remove="WeatherApi/**" />
+    <Compile Remove="GatewayApi/**" />
+    <Content Remove="GatewayApi/**" />
+    <EmbeddedResource Remove="GatewayApi/**" />
+    <None Remove="GatewayApi/**" />
   </ItemGroup>
 
 </Project>

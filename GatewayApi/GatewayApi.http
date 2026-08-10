@@ -1,0 +1,24 @@
+@Gateway_HostAddress = http://localhost:5260
+
+GET {{Gateway_HostAddress}}/
+Accept: application/json
+
+###
+
+GET {{Gateway_HostAddress}}/api/cities/Colombo
+Accept: application/json
+
+###
+
+GET {{Gateway_HostAddress}}/api/weather/Colombo
+Accept: application/json
+
+###
+
+POST {{Gateway_HostAddress}}/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "password"
+}
