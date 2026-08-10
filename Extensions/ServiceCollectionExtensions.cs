@@ -20,6 +20,7 @@ public static class ServiceCollectionExtensions
             services.AddScoped<ICityService, CityService>();
             services.AddScoped<IJWTService, JWTService>();
             services.AddScoped<LogActionFilter>();
+            services.AddScoped<ICityRepository, CityRepository>();
 
             services.AddTransient<ICityNormalizer, CityNormalizer>();
 

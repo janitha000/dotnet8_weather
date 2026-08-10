@@ -6,8 +6,9 @@ public class CityServiceTests
         var normalizer = new CityNormalizer();
         var options = Options.Create(new CacheOptions { Duration = 10 });
         var logger = new Mock<ILogger<CityService>>().Object;
+        var repo = new CityRepository(db);
 
-        return new CityService(db, cache, normalizer, options, logger);
+        return new CityService(repo, cache, normalizer, options, logger);
     }
 
     private static AppDbContext CreateDb()

@@ -1,25 +1,22 @@
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 
-
-
 public class CityService : ICityService
 {
-    private readonly AppDbContext _dbContext;
+    private readonly ICityRepository _cityRepository;
     private readonly IMemoryCache _cache;
     private readonly ICityNormalizer _cityNormalizer;
     private readonly CacheOptions _cacheOptions;
     private readonly ILogger<CityService> _logger;
 
     public CityService(
-        AppDbContext dbContext, 
-        IMemoryCache cache, 
+        ICityRepository cityRepository,
+        IMemoryCache cache,
         ICityNormalizer cityNormalizer,
-         IOptions<CacheOptions> cacheOptions, 
-         ILogger<CityService> logger)
+        IOptions<CacheOptions> cacheOptions,
+        ILogger<CityService> logger)
     {
-        _dbContext = dbContext;
+        _cityRepository = cityRepository;
         _cache = cache;
         _cityNormalizer = cityNormalizer;
         _cacheOptions = cacheOptions.Value;
@@ -28,48 +25,52 @@ public class CityService : ICityService
 
     public async Task<City?> GetCityByNameAsync(string name, CancellationToken cancellationToken = default)
     {
-        if(string.IsNullOrEmpty(name)) return null;
+        if (string.IsNullOrEmpty(name)) return null;
 
-        var cacheKey = $"city:{_cityNormalizer.Normalize(name)}";
+        var normalizedName = _cityNormalizer.Normalize(name);
+        var cacheKey = $"city:{normalizedName}";
 
-        if (_cache.TryGetValue(cacheKey, out City? cachedCity)){
-            _logger.LogInformation("City found in cache: {CityName}", cachedCity.Name);
+        if (_cache.TryGetValue(cacheKey, out City? cachedCity))
+        {
+            _logger.LogInformation("City found in cache: {CityName}", cachedCity!.Name);
             return cachedCity;
-
         }
 
         _logger.LogInformation("City not found in cache: {CityName}", name);
 
-        var city = await _dbContext.Cities
-                    .AsNoTracking()
-                    .FirstOrDefaultAsync(c => c.Name.ToLower() == name.ToLower(), cancellationToken);
+        var city = await _cityRepository.GetByNameAsync(normalizedName, cancellationToken);
 
-        if(city is not null){
-            _cache.Set(cacheKey, city, new MemoryCacheEntryOptions{
+        if (city is not null)
+        {
+            _cache.Set(cacheKey, city, new MemoryCacheEntryOptions
+            {
                 AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(_cacheOptions.Duration)
             });
         }
 
         return city;
-    } 
+    }
 
-    public async Task<City> CreateCityAsync(City city, CancellationToken cancellationToken = default){
+    public async Task<City> CreateCityAsync(City city, CancellationToken cancellationToken = default)
+    {
         var normalizedName = _cityNormalizer.Normalize(city.Name);
-        var isDuplicate = await _dbContext.Cities.AnyAsync(c => c.Name.ToLower() == normalizedName.ToLower(), cancellationToken);
-        
-        if(isDuplicate) {
+        var isDuplicate = await _cityRepository.ExistsByNameAsync(normalizedName, cancellationToken);
+
+        if (isDuplicate)
+        {
             _logger.LogWarning("City already exists: {CityName}", city.Name);
             throw new DuplicateException($"City with name {city.Name} already exists");
         }
 
+        await _cityRepository.AddAsync(city, cancellationToken);
+        await _cityRepository.SaveChangesAsync(cancellationToken);
 
-        _dbContext.Cities.Add(city);
-        await _dbContext.SaveChangesAsync(cancellationToken);
+        var cacheKey = $"city:{normalizedName}";
+        _cache.Set(cacheKey, city, new MemoryCacheEntryOptions
+        {
+            AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(_cacheOptions.Duration)
+        });
 
-        var cacheKey = $"city:{_cityNormalizer.Normalize(city.Name)}";
-         _cache.Set(cacheKey, city, new MemoryCacheEntryOptions{
-                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(_cacheOptions.Duration)
-            });
         return city;
     }
 }
