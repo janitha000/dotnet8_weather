@@ -1,8 +1,10 @@
 import { Link, Outlet } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext";
+import { useTheme } from "../theme/ThemeContext";
 
 export function Layout() {
   const { isAuthenticated, logout } = useAuth();
+  const { theme, toggleTheme } = useTheme();
 
   return (
     <div className="app">
@@ -19,6 +21,10 @@ export function Layout() {
           ) : (
             <Link to="/login">Login</Link>
           )}
+          {" · "}
+          <button type="button" onClick={toggleTheme}>
+            Theme: {theme}
+          </button>
         </nav>
       </header>
       <Outlet />

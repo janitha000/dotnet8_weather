@@ -1,17 +1,47 @@
+:root,
+[data-theme="light"] {
+  color-scheme: light;
+  --bg: #f6f4ef;
+  --text: #1a1a1a;
+  --border: #d0cbc2;
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #12141a;
+  --text: #e8e6e1;
+  --border: #2a2f3a;
+}
+
+html,
+body {
+  background: var(--bg);
+  color: var(--text);
+}
+
 .app {
   max-width: 28rem;
   margin: 2rem auto;
   padding: 0 1rem;
-  font-family: system-ui, sans-serif;
+  text-align: left;
 }
 
-form {
-  display: grid;
-  gap: 0.5rem;
-  margin: 1rem 0;
+nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+  margin-bottom: 1rem;
 }
 
-input,
-button {
+button,
+input {
+  color: inherit;
+  background: transparent;
+  border: 1px solid var(--border);
   padding: 0.5rem 0.75rem;
+}
+
+a {
+  color: inherit;
 }
