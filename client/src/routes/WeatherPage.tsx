@@ -1,31 +1,19 @@
 import { Link, useParams } from "react-router-dom";
-import { weatherKeys } from "../features/cities/weatherKeys";
-import { getCurrentWeather, getWeatherForecast } from "../api/weatherApi";
-import { useQuery } from "@tanstack/react-query";
-import { ApiError } from "../types/api";
+import { getErrorMessage } from "../api/errorMapping";
+import { ErrorAlert } from "../components/ErrorAlert";
+import { PageHeader } from "../components/PageHeader";
+import { useCityWeather } from "../hooks/useCityWeather";
 
 export function WeatherPage() {
-  const { city } = useParams();
+  const { city } = useParams<{ city: string }>();
+  const { currentQuery, forecastQuery } = useCityWeather(city);
 
-  const currentQuery = useQuery({
-    queryKey: weatherKeys.current(city ?? ""),
-    queryFn: ({ signal }) => getCurrentWeather(city!, signal),
-    enabled: Boolean(city?.trim()),
-    staleTime: 30_000,
-  });
-
-  const forecastQuery = useQuery({
-    queryKey: weatherKeys.forecast(city ?? ""),
-    queryFn: ({ signal }) => getWeatherForecast(city!, signal),
-    enabled: Boolean(city?.trim()),
-    staleTime: 60_000,
-  });
-
-  function errorText(error: unknown) {
-    if (error instanceof ApiError) return error.message;
-    if (error) return "Something went wrong";
-    return null;
-  }
+  const currentError = currentQuery.error
+    ? getErrorMessage(currentQuery.error)
+    : null;
+  const forecastError = forecastQuery.error
+    ? getErrorMessage(forecastQuery.error)
+    : null;
 
   return (
     <main>
@@ -39,12 +27,10 @@ export function WeatherPage() {
         )}
       </p>
 
-      <h1>Weather: {city}</h1>
+      <PageHeader title={`Weather: ${city ?? ""}`} />
 
       {currentQuery.isLoading && <p>Loading…</p>}
-      {errorText(currentQuery.error) && (
-        <p role="alert">{errorText(currentQuery.error)}</p>
-      )}
+      {currentError && <ErrorAlert message={currentError} />}
 
       {currentQuery.data && (
         <section>
@@ -59,9 +45,7 @@ export function WeatherPage() {
       <section>
         <h2>7-day forecast</h2>
         {forecastQuery.isLoading && <p>Loading forecast…</p>}
-        {errorText(forecastQuery.error) && (
-          <p role="alert">{errorText(forecastQuery.error)}</p>
-        )}
+        {forecastError && <ErrorAlert message={forecastError} />}
         <ul>
           {forecastQuery.data?.map((day) => (
             <li key={day.forecastedAt}>

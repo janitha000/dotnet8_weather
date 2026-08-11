@@ -1,15 +1,18 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
-import { ApiError, type CreateCityDto } from "../types/api";
-import { cityKeys } from "../features/cities/cityKeys";
 import { createCity } from "../api/citiesApi";
+import { getErrorMessage } from "../api/errorMapping";
+import { ErrorAlert } from "../components/ErrorAlert";
+import { PageHeader } from "../components/PageHeader";
+import { cityKeys } from "../features/cities/cityKeys";
+import type { CreateCityDto } from "../types/api";
+
+const numberPattern = /^-?\d+(\.\d+)?$/;
 
 export function AddCityPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-
-  const numberPattern = /^-?\d+(\.\d+)?$/;
 
   const {
     register,
@@ -28,31 +31,22 @@ export function AddCityPage() {
   const mutation = useMutation({
     mutationFn: createCity,
     onSuccess: (city) => {
-      // Seed cache so CityPage can hit immediately
       queryClient.setQueryData(cityKeys.byName(city.name), city);
-      // Optional: mark any city lists stale later
       void queryClient.invalidateQueries({ queryKey: cityKeys.all });
       navigate(`/cities/${encodeURIComponent(city.name)}`);
     },
   });
 
-  const serverError =
-    mutation.error instanceof ApiError
-      ? mutation.error.status === 409
-        ? (mutation.error.problem?.detail ??
-          mutation.error.message ??
-          "City already exists")
-        : mutation.error.status === 401
-          ? "Unauthorized — please log in again"
-          : mutation.error.message
-      : mutation.error
-        ? "Failed to create city"
-        : null;
+  const serverError = mutation.error
+    ? getErrorMessage(mutation.error, "Failed to create city")
+    : null;
 
   return (
     <main>
-      <h1>Add City</h1>
-      <p>Requires admin login. Duplicates return 409.</p>
+      <PageHeader title="Add City">
+        <p>Requires admin login. Duplicates return 409.</p>
+      </PageHeader>
+
       <form
         onSubmit={handleSubmit((values) => {
           mutation.mutate(values);
@@ -68,7 +62,8 @@ export function AddCityPage() {
             maxLength: { value: 100, message: "Max 100 characters" },
           })}
         />
-        {errors.name && <p role="alert">{errors.name.message}</p>}
+        {errors.name && <ErrorAlert message={errors.name.message ?? ""} />}
+
         <label htmlFor="country">Country</label>
         <input
           id="country"
@@ -78,7 +73,10 @@ export function AddCityPage() {
             maxLength: { value: 100, message: "Max 100 characters" },
           })}
         />
-        {errors.country && <p role="alert">{errors.country.message}</p>}
+        {errors.country && (
+          <ErrorAlert message={errors.country.message ?? ""} />
+        )}
+
         <label htmlFor="latitude">Latitude</label>
         <input
           id="latitude"
@@ -90,7 +88,10 @@ export function AddCityPage() {
             },
           })}
         />
-        {errors.latitude && <p role="alert">{errors.latitude.message}</p>}
+        {errors.latitude && (
+          <ErrorAlert message={errors.latitude.message ?? ""} />
+        )}
+
         <label htmlFor="longitude">Longitude</label>
         <input
           id="longitude"
@@ -102,18 +103,23 @@ export function AddCityPage() {
             },
           })}
         />
-        {errors.longitude && <p role="alert">{errors.longitude.message}</p>}
+        {errors.longitude && (
+          <ErrorAlert message={errors.longitude.message ?? ""} />
+        )}
+
         <label htmlFor="timeZone">Time zone (optional)</label>
         <input
           id="timeZone"
           {...register("timeZone")}
           placeholder="Asia/Colombo"
         />
+
         <button type="submit" disabled={mutation.isPending}>
           {mutation.isPending ? "Saving…" : "Create city"}
         </button>
       </form>
-      {serverError && <p role="alert">{serverError}</p>}
+
+      {serverError && <ErrorAlert message={serverError} />}
     </main>
   );
 }

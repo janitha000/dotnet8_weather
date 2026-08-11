@@ -5,6 +5,7 @@ import App from "./App.tsx";
 import { BrowserRouter } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AuthProvider } from "./auth/AuthContext.tsx";
+import { ErrorBoundary } from "./components/ErrorBoundary.tsx";
 import { ThemeProvider } from "./theme/ThemeContext.tsx";
 
 const queryClient = new QueryClient({
@@ -22,7 +23,9 @@ createRoot(document.getElementById("root")!).render(
       <BrowserRouter>
         <AuthProvider>
           <ThemeProvider>
-            <App />
+            <ErrorBoundary>
+              <App />
+            </ErrorBoundary>
           </ThemeProvider>
         </AuthProvider>
       </BrowserRouter>

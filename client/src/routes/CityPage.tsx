@@ -1,7 +1,10 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { getCityByName } from "../api/citiesApi";
-import { ApiError, type City } from "../types/api";
+import { getErrorMessage } from "../api/errorMapping";
+import { ErrorAlert } from "../components/ErrorAlert";
+import { PageHeader } from "../components/PageHeader";
+import type { City } from "../types/api";
 
 export function CityPage() {
   const { name } = useParams();
@@ -22,8 +25,7 @@ export function CityPage() {
         if (!cancelled) setCity(result);
       } catch (err) {
         if (cancelled) return;
-        if (err instanceof ApiError) setError(err.message);
-        else setError("Something went wrong");
+        setError(getErrorMessage(err));
       } finally {
         if (!cancelled) setIsLoading(false);
       }
@@ -39,16 +41,19 @@ export function CityPage() {
     <main>
       <p>
         <Link to="/">← Back</Link>
+        {city && (
+          <>
+            {" · "}
+            <Link to={`/weather/${encodeURIComponent(city.name)}`}>Weather</Link>
+          </>
+        )}
       </p>
-      <p>
-        {" "}
-        <Link to={`/weather/${encodeURIComponent(city?.name ?? "")}`}>
-          Weather
-        </Link>
-      </p>
-      <h1>City: {name}</h1>
+
+      <PageHeader title={`City: ${name ?? ""}`} />
+
       {isLoading && <p>Loading…</p>}
-      {error && <p role="alert">{error}</p>}
+      {error && <ErrorAlert message={error} />}
+
       {city && (
         <section>
           <h2>{city.name}</h2>
