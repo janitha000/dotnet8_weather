@@ -40,6 +40,12 @@ export function CityPage() {
       <p>
         <Link to="/">← Back</Link>
       </p>
+      <p>
+        {" "}
+        <Link to={`/weather/${encodeURIComponent(city?.name ?? "")}`}>
+          Weather
+        </Link>
+      </p>
       <h1>City: {name}</h1>
       {isLoading && <p>Loading…</p>}
       {error && <p role="alert">{error}</p>}
