@@ -55,6 +55,10 @@ export function CityPage() {
             <Link to={`/weather/${encodeURIComponent(city.name)}`}>
               Weather
             </Link>
+            {" · "}
+            <Link to={`/weather/compound/${encodeURIComponent(city.name)}`}>
+              Compound Weather
+            </Link>
           </>
         )}
       </p>

@@ -5,6 +5,7 @@ import { PageFallback } from "./components/PageFallback";
 import { Layout } from "./routes/Layout";
 import { HomePage } from "./routes/HomePage";
 import "./App.css";
+import { CompoundWeatherPage } from "./routes/CompundWeatherPage";
 
 // Eager: shell + landing (fast first paint)
 // Lazy: heavier / less-visited routes — separate JS chunks
@@ -40,6 +41,10 @@ function App() {
           />
           <Route path="cities/:name" element={<CityPage />} />
           <Route path="weather/:city" element={<WeatherPage />} />
+          <Route
+            path="weather/compound/:city"
+            element={<CompoundWeatherPage />}
+          />
           <Route path="login" element={<LoginPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Route>
