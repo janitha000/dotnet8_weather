@@ -3,10 +3,17 @@ import { getErrorMessage } from "../api/errorMapping";
 import { ErrorAlert } from "../components/ErrorAlert";
 import { PageHeader } from "../components/PageHeader";
 import { useCityWeather } from "../hooks/useCityWeather";
+import { useAppSelector } from "../store/hooks";
+
+function formatTemp(celsius: number, unit: "C" | "F"): string {
+  if (unit === "C") return `${celsius}°C`;
+  return `${Math.round((celsius * 9) / 5 + 32)}°F`;
+}
 
 export function WeatherPage() {
   const { city } = useParams<{ city: string }>();
   const { currentQuery, forecastQuery } = useCityWeather(city);
+  const unit = useAppSelector((state) => state.watchlist.unit);
 
   const currentError = currentQuery.error
     ? getErrorMessage(currentQuery.error)
@@ -36,7 +43,8 @@ export function WeatherPage() {
         <section>
           <h2>Now</h2>
           <p>
-            {currentQuery.data.temperature}° — {currentQuery.data.summary}
+            {formatTemp(currentQuery.data.temperature, unit)} —{" "}
+            {currentQuery.data.summary}
           </p>
           <p>{currentQuery.data.country}</p>
         </section>
@@ -50,7 +58,7 @@ export function WeatherPage() {
           {forecastQuery.data?.map((day) => (
             <li key={day.forecastedAt}>
               {new Date(day.forecastedAt).toLocaleDateString()}:{" "}
-              {day.temperature}° — {day.summary}
+              {formatTemp(day.temperature, unit)} — {day.summary}
             </li>
           ))}
         </ul>

@@ -5,12 +5,20 @@ import { getErrorMessage } from "../api/errorMapping";
 import { ErrorAlert } from "../components/ErrorAlert";
 import { PageHeader } from "../components/PageHeader";
 import type { City } from "../types/api";
+import { useAppDispatch, useAppSelector } from "../store/hooks";
+import { addToWatchlist, removeFromWatchlist } from "../store/watchlistSlice";
 
 export function CityPage() {
   const { name } = useParams();
   const [city, setCity] = useState<City | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const dispatch = useAppDispatch();
+  const watchlist = useAppSelector((state) => state.watchlist.cities);
+  const pinned = watchlist.some(
+    (c) => c.toLowerCase() === (name ?? "").toLowerCase(),
+  );
 
   useEffect(() => {
     if (!name) return;
@@ -44,9 +52,24 @@ export function CityPage() {
         {city && (
           <>
             {" · "}
-            <Link to={`/weather/${encodeURIComponent(city.name)}`}>Weather</Link>
+            <Link to={`/weather/${encodeURIComponent(city.name)}`}>
+              Weather
+            </Link>
           </>
         )}
+      </p>
+      <p>
+        <button
+          type="button"
+          onClick={() => {
+            const target = city?.name ?? name;
+            if (!target) return;
+            if (pinned) dispatch(removeFromWatchlist(target));
+            else dispatch(addToWatchlist(target));
+          }}
+        >
+          {pinned ? "Unpin" : "Pin to watchlist"}
+        </button>
       </p>
 
       <PageHeader title={`City: ${name ?? ""}`} />
