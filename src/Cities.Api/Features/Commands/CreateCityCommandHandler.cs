@@ -60,6 +60,7 @@ public class CreateCityCommandHandler : IRequestHandler<CreateCityCommand, City>
             city.Id,
             city.Name,
             city.Country,
+            city.TenantId,
             DateTime.UtcNow);
 
         _db.OutboxMessages.Add(new OutboxMessage
@@ -81,7 +82,8 @@ public class CreateCityCommandHandler : IRequestHandler<CreateCityCommand, City>
                 city.Country,
                 city.Latitude,
                 city.Longitude,
-                city.TimeZone),
+                city.TimeZone,
+                city.TenantId),
             cancellationToken);
 
         return city;

@@ -17,6 +17,7 @@ public class CityController : ControllerBase
         _sender = sender;
     }
 
+    [Authorize]
     [HttpGet("{name}")]
     public async Task<IActionResult> GetCityByNameAsync(string name, CancellationToken cancellationToken = default)
     {

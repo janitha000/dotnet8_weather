@@ -8,7 +8,7 @@ public class CityServiceTests
         var logger = new Mock<ILogger<CityService>>().Object;
         var repo = new CityRepository(db);
 
-        return new CityService(repo, cache, normalizer, options, logger);
+        return new CityService(repo, cache, normalizer, options, logger, new FakeTenantContext("acme"));
     }
 
     private static AppDbContext CreateDb(string tenantId = "acme")

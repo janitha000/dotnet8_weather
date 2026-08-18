@@ -8,27 +8,30 @@ public class CityService : ICityService
     private readonly ICityNormalizer _cityNormalizer;
     private readonly CacheOptions _cacheOptions;
     private readonly ILogger<CityService> _logger;
+    private readonly ITenantContext _tenant;
 
     public CityService(
         ICityRepository cityRepository,
         IMemoryCache cache,
         ICityNormalizer cityNormalizer,
         IOptions<CacheOptions> cacheOptions,
-        ILogger<CityService> logger)
+        ILogger<CityService> logger,
+        ITenantContext tenant)
     {
         _cityRepository = cityRepository;
         _cache = cache;
         _cityNormalizer = cityNormalizer;
         _cacheOptions = cacheOptions.Value;
         _logger = logger;
+        _tenant = tenant;
     }
 
     public async Task<City?> GetCityByNameAsync(string name, CancellationToken cancellationToken = default)
     {
-        if (string.IsNullOrEmpty(name)) return null;
+        if (string.IsNullOrEmpty(name) || !_tenant.IsResolved) return null;
 
         var normalizedName = _cityNormalizer.Normalize(name);
-        var cacheKey = $"city:{normalizedName}";
+        var cacheKey = CityCacheKey.For(_tenant.TenantId!, normalizedName);
 
         if (_cache.TryGetValue(cacheKey, out City? cachedCity))
         {
@@ -62,10 +65,15 @@ public class CityService : ICityService
             throw new DuplicateException($"City with name {city.Name} already exists");
         }
 
+        if (string.IsNullOrWhiteSpace(city.TenantId) && _tenant.IsResolved)
+            city.TenantId = _tenant.TenantId!;
+
         await _cityRepository.AddAsync(city, cancellationToken);
         await _cityRepository.SaveChangesAsync(cancellationToken);
 
-        var cacheKey = $"city:{normalizedName}";
+        var cacheKey = CityCacheKey.For(
+            string.IsNullOrWhiteSpace(city.TenantId) ? _tenant.TenantId! : city.TenantId,
+            normalizedName);
         _cache.Set(cacheKey, city, new MemoryCacheEntryOptions
         {
             AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(_cacheOptions.Duration)

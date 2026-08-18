@@ -3,4 +3,5 @@ public record CityCreatedIntegrationEvent(
     int CityId,
     string Name,
     string Country,
+    string TenantId,
     DateTime OccurredOnUtc);

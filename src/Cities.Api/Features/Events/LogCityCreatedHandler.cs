@@ -9,9 +9,10 @@ public class LogCityCreatedHandler : INotificationHandler<CityCreated>
     public Task Handle(CityCreated notification, CancellationToken cancellationToken)
     {
         _logger.LogInformation(
-            "Domain event CityCreated: {CityId} {CityName}",
+            "Domain event CityCreated: {CityId} {CityName} {TenantId}",
             notification.Id,
-            notification.Name);
+            notification.Name,
+            notification.TenantId);
         return Task.CompletedTask;
     }
 }

@@ -20,7 +20,7 @@ public class CacheCityOnCreatedHandler : INotificationHandler<CityCreated>
 
     public Task Handle(CityCreated notification, CancellationToken cancellationToken)
     {
-        var key = $"city:{_normalizer.Normalize(notification.Name)}";
+        var key = CityCacheKey.For(notification.TenantId, _normalizer.Normalize(notification.Name));
         var city = new City
         {
             Id = notification.Id,
@@ -28,7 +28,8 @@ public class CacheCityOnCreatedHandler : INotificationHandler<CityCreated>
             Country = notification.Country,
             Latitude = notification.Latitude,
             Longitude = notification.Longitude,
-            TimeZone = notification.TimeZone
+            TimeZone = notification.TimeZone,
+            TenantId = notification.TenantId
         };
 
         _cache.Set(key, city, new MemoryCacheEntryOptions

@@ -9,25 +9,32 @@ public class GetCityByNameQueryHandler : IRequestHandler<GetCityByNameQuery, Cit
     private readonly IMemoryCache _memoryCache;
     private readonly CacheOptions _cacheOptions;
     private readonly ILogger<GetCityByNameQueryHandler> _logger;
+    private readonly ITenantContext _tenant;
 
     public GetCityByNameQueryHandler(
         ICityRepository cityRepository,
         ICityNormalizer cityNormalizer,
         IMemoryCache memoryCache,
         IOptions<CacheOptions> cacheOptions,
-        ILogger<GetCityByNameQueryHandler> logger)
+        ILogger<GetCityByNameQueryHandler> logger,
+        ITenantContext tenant)
     {
         _cityRepository = cityRepository;
         _cityNormalizer = cityNormalizer;
         _memoryCache = memoryCache;
         _cacheOptions = cacheOptions.Value;
         _logger = logger;
+        _tenant = tenant;
     }
 
     public async Task<City?> Handle(GetCityByNameQuery request, CancellationToken cancellationToken)
     {
+        if (!_tenant.IsResolved)
+            return null;
+
         var normalizedName = _cityNormalizer.Normalize(request.Name);
-        var cacheKey = $"city:{normalizedName}";
+        var cacheKey = CityCacheKey.For(_tenant.TenantId!, normalizedName);
+
 
         if (_memoryCache.TryGetValue(cacheKey, out City? city))
         {

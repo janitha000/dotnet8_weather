@@ -33,6 +33,18 @@ public sealed class RabbitMqPublisher : IIntegrationEventPublisher, IDisposable
         properties.Type = type;
         properties.DeliveryMode = 2;
 
+        if (type == nameof(CityCreatedIntegrationEvent))
+        {
+            var evt = System.Text.Json.JsonSerializer.Deserialize<CityCreatedIntegrationEvent>(payload);
+            if (!string.IsNullOrWhiteSpace(evt?.TenantId))
+            {
+                properties.Headers = new Dictionary<string, object>
+                {
+                    [TenantClaims.TenantId] = evt.TenantId
+                };
+            }
+        }
+
         var routingKey = type == nameof(CityCreatedIntegrationEvent)
             ? RabbitMqTopology.CityCreatedRoutingKey
             : type.ToLowerInvariant();

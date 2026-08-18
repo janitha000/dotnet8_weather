@@ -6,5 +6,6 @@ public record CityCreated(
     string Country,
     string Latitude,
     string Longitude,
-    string TimeZone
-) : INotification;
+    string TimeZone,
+    string TenantId
+    ) : INotification;
