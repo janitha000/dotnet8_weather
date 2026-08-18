@@ -40,8 +40,8 @@ public static class ServiceCollectionExtensions
             services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
 
-        services.AddDbContext<AppDbContext>(options =>
-            options.UseSqlite(config.GetConnectionString("Default")));
+            services.AddDbContext<AppDbContext>(options =>
+                options.UseSqlite(config.GetConnectionString("Default")));
 
             return services;
         }
@@ -91,6 +91,19 @@ public static class ServiceCollectionExtensions
                         .AllowAnyMethod();
                     });
             });
+            return services;
+        }
+
+        public static IServiceCollection AddRabbitMq(
+            this IServiceCollection services,
+            IConfiguration config)
+        {
+            services.Configure<RabbitMqOptions>(
+                config.GetSection(RabbitMqOptions.SectionName));
+
+            // Real RabbitMqPublisher comes next. No-op keeps the app bootable.
+            services.AddSingleton<IIntegrationEventPublisher, NoOpIntegrationEventPublisher>();
+
             return services;
         }
 
