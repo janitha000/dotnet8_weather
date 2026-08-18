@@ -27,7 +27,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\InterviewApi.csproj" />
+    <ProjectReference Include="..\..\src\Cities.Api\Cities.Api.csproj" />
   </ItemGroup>
 
 </Project>

@@ -6,13 +6,14 @@ on:
     paths:
       - "**.cs"
       - "**.csproj"
-      - "Protos/**"
+      - "src/Contracts/**"
+      - "src/Cities.Api/**"
+      - "src/Weather.Api/**"
       - "Dockerfile.cities"
       - "Dockerfile.weather"
       - ".dockerignore"
       - ".github/workflows/cd-apps.yml"
-      - "WeatherApi/**"
-      - "!InterviewApi.Tests/**"
+      - "!tests/**"
   workflow_dispatch:
 
 permissions:

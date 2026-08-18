@@ -23,27 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Protobuf Include="Protos\city_lookup.proto" GrpcServices="Server" />
-  </ItemGroup>
-
-  <!-- Nested projects live under this folder; don't compile their sources into the web app -->
-  <ItemGroup>
-    <Compile Remove="InterviewApi.Tests/**" />
-    <Content Remove="InterviewApi.Tests/**" />
-    <EmbeddedResource Remove="InterviewApi.Tests/**" />
-    <None Remove="InterviewApi.Tests/**" />
-    <Compile Remove="WeatherApi/**" />
-    <Content Remove="WeatherApi/**" />
-    <EmbeddedResource Remove="WeatherApi/**" />
-    <None Remove="WeatherApi/**" />
-    <Compile Remove="GatewayApi/**" />
-    <Content Remove="GatewayApi/**" />
-    <EmbeddedResource Remove="GatewayApi/**" />
-    <None Remove="GatewayApi/**" />
-    <Compile Remove="infra/**" />
-    <Content Remove="infra/**" />
-    <EmbeddedResource Remove="infra/**" />
-    <None Remove="infra/**" />
+    <Protobuf Include="..\Contracts\city_lookup.proto" GrpcServices="Server" />
   </ItemGroup>
 
 </Project>

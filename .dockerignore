@@ -8,13 +8,15 @@
 **/*.db
 **/*.db-shm
 **/*.db-wal
-**/InterviewApi.Tests
-**/GatewayApi
+**/tests
+src/Gateway.Api
+src/Client
 **/infra
 **/.github
 **/agent-transcripts
 **/terminals
 **/node_modules
+**/dist
 README.md
 *.md
 *.http

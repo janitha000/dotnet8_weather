@@ -1,15 +1,16 @@
-# Cities API (InterviewApi) — build from repo root:
+# Cities API — build from repo root:
 #   docker build -f Dockerfile.cities -t cities-api:local .
 
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-COPY InterviewApi.csproj ./
-COPY Protos/ ./Protos/
-RUN dotnet restore InterviewApi.csproj
+COPY src/Cities.Api/Cities.Api.csproj src/Cities.Api/
+COPY src/Contracts/ src/Contracts/
+RUN dotnet restore src/Cities.Api/Cities.Api.csproj
 
-COPY . ./
-RUN dotnet publish InterviewApi.csproj -c Release -o /app/publish /p:UseAppHost=false
+COPY src/Cities.Api/ src/Cities.Api/
+COPY src/Contracts/ src/Contracts/
+RUN dotnet publish src/Cities.Api/Cities.Api.csproj -c Release -o /app/publish /p:UseAppHost=false
 
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
 WORKDIR /app
@@ -17,4 +18,4 @@ ENV ASPNETCORE_URLS=http://+:8080
 ENV ASPNETCORE_ENVIRONMENT=Production
 EXPOSE 8080
 COPY --from=build /app/publish .
-ENTRYPOINT ["dotnet", "InterviewApi.dll"]
+ENTRYPOINT ["dotnet", "Cities.Api.dll"]

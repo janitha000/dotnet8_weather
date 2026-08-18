@@ -22,13 +22,13 @@ jobs:
           dotnet-version: "8.0.x"
 
       - name: Restore
-        run: dotnet restore InterviewApi.sln
+        run: dotnet restore Interview.sln
 
       - name: Build
-        run: dotnet build InterviewApi.sln -c Release --no-restore
+        run: dotnet build Interview.sln -c Release --no-restore
 
       - name: Test
-        run: dotnet test InterviewApi.Tests/InterviewApi.Tests.csproj -c Release --no-build --verbosity normal
+        run: dotnet test tests/Cities.Api.Tests/Cities.Api.Tests.csproj -c Release --no-build --verbosity normal
 
   docker:
     runs-on: ubuntu-latest

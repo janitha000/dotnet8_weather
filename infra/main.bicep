@@ -43,7 +43,7 @@ module cae 'modules/containerAppsEnvironment.bicep' = {
   }
 }
 
-// ---------- Cities API (InterviewApi) ----------
+// ---------- Cities API ----------
 module citiesApi 'modules/containerApp.bicep' = {
   name: 'cities-api'
   params: {
