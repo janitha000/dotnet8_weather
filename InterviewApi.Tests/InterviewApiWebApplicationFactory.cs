@@ -13,7 +13,7 @@ public class InterviewApiWebApplicationFactory : WebApplicationFactory<Program>
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.UseEnvironment("Development");
-
+        builder.UseSetting("RabbitMq:Enabled", "false");
         builder.ConfigureServices(services =>
         {
             // Remove the app's SQLite AppDbContext registration

@@ -34,6 +34,7 @@ public class OutboxDispatcher : BackgroundService
     {
         using var scope = _scopeFactory.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        var publisher = scope.ServiceProvider.GetRequiredService<IIntegrationEventPublisher>();
 
         var pending = await db.OutboxMessages
             .Where(x => x.ProcessedOnUtc == null)
@@ -45,11 +46,7 @@ public class OutboxDispatcher : BackgroundService
         {
             try
             {
-                // Learning "bus": log. Later → RabbitMQ/Service Bus.
-                _logger.LogInformation(
-                    "OUTBOX PUBLISH {Type} {Id} {Payload}",
-                    message.Type, message.Id, message.Payload);
-
+                await publisher.PublishAsync(message.Type, message.Payload, ct);
                 message.ProcessedOnUtc = DateTime.UtcNow;
                 message.Error = null;
             }
