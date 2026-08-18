@@ -9,7 +9,7 @@ export function LoginPage() {
   const location = useLocation();
   const from = (location.state as { from?: string } | null)?.from ?? "/";
 
-  const [username, setUsername] = useState("admin");
+  const [username, setUsername] = useState("acme");
   const [password, setPassword] = useState("password");
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);

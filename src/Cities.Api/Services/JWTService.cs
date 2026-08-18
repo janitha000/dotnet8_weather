@@ -13,13 +13,14 @@ public class JWTService : IJWTService
         _jwt = jwtOptions.Value;
     }
 
-    public string GenerateToken(string username)
+    public string GenerateToken(string username, string tenantId, string role)
     {
         var claims = new[]
         {
             new Claim(ClaimTypes.Name, username),
-            new Claim(ClaimTypes.Role, "Admin"),
+            new Claim(ClaimTypes.Role, role),
             new Claim(JwtRegisteredClaimNames.Sub, username),
+            new Claim(TenantClaims.TenantId, tenantId)
         };
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwt.Key));

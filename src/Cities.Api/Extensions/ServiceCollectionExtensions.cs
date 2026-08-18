@@ -22,6 +22,11 @@ public static class ServiceCollectionExtensions
             services.AddScoped<IJWTService, JWTService>();
             services.AddScoped<LogActionFilter>();
             services.AddScoped<ICityRepository, CityRepository>();
+
+            services.AddHttpContextAccessor();
+            services.AddScoped<ITenantContext, HttpTenantContext>();
+
+
             services.AddHostedService<OutboxDispatcher>();
             services.AddGrpc();
 

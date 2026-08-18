@@ -18,10 +18,23 @@ public class AuthController : ControllerBase
     [AllowAnonymous]
     public IActionResult Login([FromBody] LoginDto loginDto)
     {
-        if (loginDto.Username != "admin" || loginDto.Password != "password")
+        var user = DemoUsers.Find(loginDto.Username, loginDto.Password);
+        if (user is null)
             return Unauthorized();
+        
+        var accessToken = _jwtService.GenerateToken(user.Username, user.TenantId, user.Role);
+        return Ok(new { accessToken, tenantId = user.TenantId });
+    }
 
-        var accessToken = _jwtService.GenerateToken(loginDto.Username);
-        return Ok(new { accessToken });
+    [HttpGet("me")]
+    [Authorize]
+    public IActionResult Me([FromServices] ITenantContext tenant)
+    {
+        return Ok(new
+        {
+            username = User.Identity?.Name,
+            tenantId = tenant.TenantId,
+            role = User.FindFirst(ClaimTypes.Role)?.Value
+        });
     }
 }
