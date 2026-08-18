@@ -8,6 +8,7 @@ public class City
     public string Latitude { get; set; } = string.Empty;
     public string Longitude { get; set; } = string.Empty;
     public string TimeZone { get; set; } = string.Empty;
+    public string TenantId { get; set; } = string.Empty;
 }
 
 public class CreateCityDto

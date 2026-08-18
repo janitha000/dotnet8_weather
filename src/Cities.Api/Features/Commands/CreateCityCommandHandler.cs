@@ -8,19 +8,22 @@ public class CreateCityCommandHandler : IRequestHandler<CreateCityCommand, City>
     private readonly AppDbContext _db;
     private readonly IPublisher _publisher;
     private readonly ILogger<CreateCityCommandHandler> _logger;
+    private readonly ITenantContext _tenant;
 
     public CreateCityCommandHandler(
         ICityRepository cityRepository,
         ICityNormalizer cityNormalizer,
         AppDbContext db,
         IPublisher publisher,
-        ILogger<CreateCityCommandHandler> logger)
+        ILogger<CreateCityCommandHandler> logger,
+        ITenantContext tenant)
     {
         _cityRepository = cityRepository;
         _cityNormalizer = cityNormalizer;
         _db = db;
         _publisher = publisher;
         _logger = logger;
+        _tenant = tenant;
     }
 
     public async Task<City> Handle(CreateCityCommand request, CancellationToken cancellationToken)
@@ -32,13 +35,19 @@ public class CreateCityCommandHandler : IRequestHandler<CreateCityCommand, City>
             throw new DuplicateException($"City with name '{request.Name}' already exists");
         }
 
+        if (!_tenant.IsResolved)
+        {
+            throw new UnauthorizedAccessException("Tenant is required");
+        }
+
         var city = new City
         {
             Name = request.Name,
             Country = request.Country,
             Latitude = request.Latitude,
             Longitude = request.Longitude,
-            TimeZone = request.TimeZone
+            TimeZone = request.TimeZone,
+            TenantId = _tenant.TenantId!
         };
 
         await using var tx = await _db.Database.BeginTransactionAsync(cancellationToken);

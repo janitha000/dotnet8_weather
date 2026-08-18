@@ -11,20 +11,29 @@ public class CityServiceTests
         return new CityService(repo, cache, normalizer, options, logger);
     }
 
-    private static AppDbContext CreateDb()
+    private static AppDbContext CreateDb(string tenantId = "acme")
     {
         var opts = new DbContextOptionsBuilder<AppDbContext>()
             .UseInMemoryDatabase(Guid.NewGuid().ToString()) // unique DB per test
             .Options;
-        return new AppDbContext(opts);
+        return new AppDbContext(opts, new FakeTenantContext(tenantId));
     }
+
+    private static City Colombo(string tenantId = "acme") => new()
+    {
+        Name = "Colombo",
+        Country = "Sri Lanka",
+        Latitude = "1",
+        Longitude = "2",
+        TenantId = tenantId
+    };
 
     [Fact]
     public async Task GetCityByNameAsync_ReturnsCity_WhenExists()
     {
         // Arrange
         await using var db = CreateDb();
-        db.Cities.Add(new City { Name = "Colombo", Country = "Sri Lanka", Latitude = "1", Longitude = "2" });
+        db.Cities.Add(Colombo());
         await db.SaveChangesAsync();
         var sut = CreateSut(db);
 
@@ -40,11 +49,11 @@ public class CityServiceTests
     public async Task CreateCityAsync_ThrowsDuplicateException_WhenNameExists()
     {
         await using var db = CreateDb();
-        db.Cities.Add(new City { Name = "Colombo", Country = "LK", Latitude = "1", Longitude = "2" });
+        db.Cities.Add(Colombo());
         await db.SaveChangesAsync();
         var sut = CreateSut(db);
 
-        var act = () => sut.CreateCityAsync(new City { Name = "Colombo", Country = "LK", Latitude = "1", Longitude = "2" });
+        var act = () => sut.CreateCityAsync(Colombo());
 
         await Assert.ThrowsAsync<DuplicateException>(act);
     }
@@ -53,7 +62,7 @@ public class CityServiceTests
     public async Task GetCityByNameAsync_UsesCache_OnSecondCall()
     {
         await using var db = CreateDb();
-        db.Cities.Add(new City { Name = "Colombo", Country = "LK", Latitude = "1", Longitude = "2" });
+        db.Cities.Add(Colombo());
         await db.SaveChangesAsync();
         var sut = CreateSut(db);
 

@@ -2,17 +2,21 @@ using Microsoft.EntityFrameworkCore;
 
 public class AppDbContext : DbContext
 {
-    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) 
+    private readonly string? _tenantId;
+
+    public AppDbContext(DbContextOptions<AppDbContext> options, ITenantContext tenant) : base(options) 
     {
-       
+        _tenantId = tenant.TenantId;
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-         modelBuilder.Entity<City>(e =>
+        modelBuilder.Entity<City>(e =>
         {
-            e.HasIndex(x => x.Name).IsUnique();
             e.Property(x => x.Name).HasMaxLength(100).IsRequired();
+            e.Property(x => x.TenantId).HasMaxLength(64).IsRequired();
+            e.HasIndex(x => new { x.TenantId, x.Name }).IsUnique();
+            e.HasQueryFilter(c => _tenantId != null && c.TenantId == _tenantId);
         });
     }
 

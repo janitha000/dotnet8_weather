@@ -14,12 +14,12 @@ public static class WebApplicationExtensions
         else
             db.Database.EnsureCreated();
 
-        if (!db.Cities.Any())
+        if (!db.Cities.IgnoreQueryFilters().Any())
         {
             db.Cities.AddRange(
-                new City { Name = "Tehran", Country = "Iran", Latitude = "35.7152", Longitude = "51.4043" },
-                new City { Name = "Colombo", Country = "Sri Lanka", Latitude = "6.9271", Longitude = "79.8612" },
-                new City { Name = "Mumbai", Country = "India", Latitude = "19.0760", Longitude = "72.8777" });
+                new City { Name = "Tehran", Country = "Iran", Latitude = "35.7152", Longitude = "51.4043", TenantId = "acme" },
+                new City { Name = "Colombo", Country = "Sri Lanka", Latitude = "6.9271", Longitude = "79.8612", TenantId = "acme" },
+                new City { Name = "Mumbai", Country = "India", Latitude = "19.0760", Longitude = "72.8777", TenantId = "acme" });
             db.SaveChanges();
         }
 
