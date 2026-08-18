@@ -95,14 +95,19 @@ public static class ServiceCollectionExtensions
         }
 
         public static IServiceCollection AddRabbitMq(
-            this IServiceCollection services,
-            IConfiguration config)
+    this IServiceCollection services,
+    IConfiguration config)
         {
             services.Configure<RabbitMqOptions>(
                 config.GetSection(RabbitMqOptions.SectionName));
 
-            // Real RabbitMqPublisher comes next. No-op keeps the app bootable.
-            services.AddSingleton<IIntegrationEventPublisher, NoOpIntegrationEventPublisher>();
+            var rabbit = config.GetSection(RabbitMqOptions.SectionName).Get<RabbitMqOptions>()
+                ?? new RabbitMqOptions();
+
+            if (rabbit.Enabled)
+                services.AddSingleton<IIntegrationEventPublisher, RabbitMqPublisher>();
+            else
+                services.AddSingleton<IIntegrationEventPublisher, NoOpIntegrationEventPublisher>();
 
             return services;
         }
